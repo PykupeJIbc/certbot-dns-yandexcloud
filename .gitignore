@@ -1,3 +1,5 @@
-venv
+venv/
+dist/
+*.egg-info/
 sa.json
 *.ini
