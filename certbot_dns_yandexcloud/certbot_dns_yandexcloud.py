@@ -29,7 +29,6 @@ class Authenticator(dns_common.DNSAuthenticator):
 
     description = 'Obtain certificates using a DNS TXT record (if you are ' + \
                   'using YandexCloud for DNS).'
-    ttl = 600
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
@@ -57,12 +56,12 @@ class Authenticator(dns_common.DNSAuthenticator):
 
     def _perform(self, domain: str, validation_name: str, validation: str) -> None:
         self._get_yandexcloud_client().add_txt_record(
-            self.credentials.conf('folder_id'), domain, validation_name, validation, self.ttl
+            self.credentials.conf('folder_id'), domain, validation_name, validation
         )
 
     def _cleanup(self, domain: str, validation_name: str, validation: str) -> None:
         self._get_yandexcloud_client().del_txt_record(
-            self.credentials.conf('folder_id'), domain, validation_name, validation, self.ttl
+            self.credentials.conf('folder_id'), domain, validation_name, validation
         )
 
     def _get_yandexcloud_client(self) -> "_YandexCloudClient":
@@ -82,7 +81,7 @@ class _YandexCloudClient():
             retriable_codes=[grpc.StatusCode.UNAVAILABLE]
             )
 
-        with open(sa_json_path) as infile:
+        with open(sa_json_path, encoding="utf-8") as infile:
             self.sdk = yandexcloud.SDK(
                 interceptor=interceptor,
                 service_account_key=json.load(infile)
@@ -90,8 +89,7 @@ class _YandexCloudClient():
     def add_txt_record(
         self, folder_id, domain: str,
         record_name: str,
-        recodr_content: str,
-        record_ttl: int) -> None:
+        recodr_content: str) -> None:
         '''Add DNS recors'''
 
         zone_id = self._find_zone_id(folder_id, domain)
@@ -99,7 +97,7 @@ class _YandexCloudClient():
         self.sdk.client(DnsZoneServiceStub).UpsertRecordSets(
             UpsertRecordSetsRequest(
                 dns_zone_id=zone_id, merges=[RecordSet(
-                    name=f"{record_name}.", type="TXT", ttl=record_ttl, data=[recodr_content]
+                    name=f"{record_name}.", type="TXT", ttl=600, data=[recodr_content]
                 )]
             )
         )
@@ -109,8 +107,7 @@ class _YandexCloudClient():
     def del_txt_record(
         self, folder_id, domain: str,
         record_name: str,
-        recodr_content: str,
-        record_ttl: int) -> None:
+        recodr_content: str) -> None:
         '''Delete DNS record'''
 
         zone_id = self._find_zone_id(folder_id, domain)
@@ -118,7 +115,7 @@ class _YandexCloudClient():
         self.sdk.client(DnsZoneServiceStub).UpsertRecordSets(
             UpsertRecordSetsRequest(
                 dns_zone_id=zone_id, deletions=[RecordSet(
-                    name=f"{record_name}.", type="TXT", ttl=record_ttl, data=[recodr_content]
+                    name=f"{record_name}.", type="TXT", ttl=600, data=[recodr_content]
                 )]
             )
         )

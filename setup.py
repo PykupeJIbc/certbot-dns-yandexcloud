@@ -1,18 +1,19 @@
+'''Python module/package installation file'''
 from setuptools import setup, find_packages
 
-version = '0.0.1'
+VERSION = '0.0.1'
 
 install_requires = [
     'yandexcloud>=0.175.0',
     'certbot>=1.29.0',
 ]
 
-with open("README.md") as f:
+with open("README.md", encoding="utf-8") as f:
     long_description = f.read()
 
 setup(
     name='certbot-dns-yandexcloud',
-    version=version,
+    version=VERSION,
     description='YandexCloud DNS Authenticator plugin for Certbot',
     long_description=long_description,
     long_description_content_type="text/markdown",
