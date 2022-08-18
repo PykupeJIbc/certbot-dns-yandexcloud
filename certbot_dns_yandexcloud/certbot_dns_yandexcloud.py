@@ -4,8 +4,8 @@ from typing import Any
 from typing import Callable
 from typing import Optional
 
-import grpc
 import json
+import grpc
 import yandexcloud
 from yandex.cloud.dns.v1.dns_zone_service_pb2_grpc import DnsZoneServiceStub
 from yandex.cloud.dns.v1.dns_zone_service_pb2 import ListDnsZonesRequest
@@ -87,14 +87,12 @@ class _YandexCloudClient():
                 interceptor=interceptor,
                 service_account_key=json.load(infile)
                 )
-    """
-    Add DNS record
-    """
     def add_txt_record(
         self, folder_id, domain: str,
         record_name: str,
         recodr_content: str,
         record_ttl: int) -> None:
+        '''Add DNS recors'''
 
         zone_id = self._find_zone_id(folder_id, domain)
 
@@ -108,14 +106,12 @@ class _YandexCloudClient():
 
         logger.debug('Successfully added TXT record with id: %s', record_name)
 
-    """
-    Delete DNS record
-    """
     def del_txt_record(
         self, folder_id, domain: str,
         record_name: str,
         recodr_content: str,
         record_ttl: int) -> None:
+        '''Delete DNS record'''
 
         zone_id = self._find_zone_id(folder_id, domain)
 
