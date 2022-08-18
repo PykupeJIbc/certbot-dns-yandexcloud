@@ -77,12 +77,22 @@ class _YandexCloudClient():
     Encapsulates all communication with the YandexCloud API.
     """
     def __init__(self, sa_json_path: str) -> None:
-        interceptor = yandexcloud.RetryInterceptor(max_retry_count=5, retriable_codes=[grpc.StatusCode.UNAVAILABLE])
-        
-        with open(sa_json_path) as infile:
-            self.sdk = yandexcloud.SDK(interceptor=interceptor, service_account_key=json.load(infile))
+        interceptor = yandexcloud.RetryInterceptor(
+            max_retry_count=5, 
+            retriable_codes=[grpc.StatusCode.UNAVAILABLE]
+            )
 
-    def add_txt_record(self, folder_id, domain: str, record_name: str, recodr_content: str, record_ttl: int) -> None:
+        with open(sa_json_path) as infile:
+            self.sdk = yandexcloud.SDK(
+                interceptor=interceptor, 
+                service_account_key=json.load(infile)
+                )
+
+    def add_txt_record(
+        self, folder_id, domain: str, 
+        record_name: str, 
+        recodr_content: str, 
+        record_ttl: int) -> None:
         zone_id = self._find_zone_id(folder_id, domain)
 
         self.sdk.client(DnsZoneServiceStub).UpsertRecordSets(
@@ -95,7 +105,11 @@ class _YandexCloudClient():
 
         logger.debug('Successfully added TXT record with id: %s', record_name)
 
-    def del_txt_record(self, folder_id, domain: str, record_name: str, recodr_content: str, record_ttl: int) -> None:
+    def del_txt_record(
+        self, folder_id, domain: str, 
+        record_name: str, 
+        recodr_content: str, 
+        record_ttl: int) -> None:
         zone_id = self._find_zone_id(folder_id, domain)
 
         self.sdk.client(DnsZoneServiceStub).UpsertRecordSets(
